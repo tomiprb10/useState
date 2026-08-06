@@ -11,7 +11,6 @@ const FORM_VACIO = {
 export function useFormularioContacto(contactoEditando, onGuardar) {
   const [form, setForm] = useState(FORM_VACIO);
 
-  // Cuando cambia el contactoEditando, cargamos sus datos en el formulario
   useEffect(() => {
     if (contactoEditando) {
       setForm(contactoEditando);
@@ -35,7 +34,6 @@ export function useFormularioContacto(contactoEditando, onGuardar) {
 
     onGuardar(form);
 
-    // Si se estaba agregando uno nuevo, limpiar campos
     if (!contactoEditando) {
       setForm(FORM_VACIO);
     }

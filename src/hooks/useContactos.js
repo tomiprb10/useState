@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 
 const CONTACTOS_INICIALES = [
   {
-    id: 1,
+    id: "init-1",
     nombre: "Carolina Pérez",
     telefono: "300 123 4567",
     correo: "carolina@sena.edu.co",
     etiqueta: "Compañero",
   },
   {
-    id: 2,
+    id: "init-2",
     nombre: "Alejandro Gómez",
     telefono: "311 987 6543",
     correo: "alejandro.g@gmail.com",
@@ -18,36 +18,33 @@ const CONTACTOS_INICIALES = [
 ];
 
 export function useContactos() {
-  // 1. Carga inicial desde localStorage (si no hay nada, usa CONTACTOS_INICIALES)
   const [contactos, setContactos] = useState(() => {
-    const guardados = localStorage.getItem("contactos");
-    return guardados ? JSON.parse(guardados) : CONTACTOS_INICIALES;
+    try {
+      const guardados = localStorage.getItem("contactos");
+      return guardados ? JSON.parse(guardados) : CONTACTOS_INICIALES;
+    } catch {
+      return CONTACTOS_INICIALES;
+    }
   });
 
   const [contactoEditando, setContactoEditando] = useState(null);
 
-  // 2. Persistencia automática: guarda en localStorage cada vez que cambie 'contactos'
   useEffect(() => {
     localStorage.setItem("contactos", JSON.stringify(contactos));
   }, [contactos]);
 
-  // Agregar contacto nuevo
   const agregarContacto = (nuevo) => {
-    setContactos((prev) => [{ id: Date.now(), ...nuevo }, ...prev]);
+    const nuevoContacto = { ...nuevo, id: `contacto-${Date.now()}` };
+    setContactos((prev) => [nuevoContacto, ...prev]);
   };
 
-  // Actualizar contacto existente usando .map()
   const actualizarContacto = (contactoActualizado) => {
     setContactos((prev) =>
-      prev.map((contacto) =>
-        contacto.id === contactoActualizado.id ? contactoActualizado : contacto
-      )
+      prev.map((c) => (c.id === contactoActualizado.id ? contactoActualizado : c))
     );
-    // Vuelve automáticamente al modo "Agregar"
     setContactoEditando(null);
   };
 
-  // Decide si guarda uno nuevo o actualiza existente
   const guardarContacto = (datos) => {
     if (contactoEditando) {
       actualizarContacto(datos);
@@ -56,7 +53,6 @@ export function useContactos() {
     }
   };
 
-  // Carga el contacto en el formulario
   const editarContacto = (contacto) => {
     setContactoEditando(contacto);
   };
@@ -66,7 +62,7 @@ export function useContactos() {
   };
 
   const eliminarContacto = (id) => {
-    setContactos((prev) => prev.filter((contacto) => contacto.id !== id));
+    setContactos((prev) => prev.filter((c) => c.id !== id));
     if (contactoEditando?.id === id) {
       setContactoEditando(null);
     }
