@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const CONTACTOS_INICIALES = [
   {
@@ -18,8 +18,18 @@ const CONTACTOS_INICIALES = [
 ];
 
 export function useContactos() {
-  const [contactos, setContactos] = useState(CONTACTOS_INICIALES);
+  // 1. Carga inicial desde localStorage (si no hay nada, usa CONTACTOS_INICIALES)
+  const [contactos, setContactos] = useState(() => {
+    const guardados = localStorage.getItem("contactos");
+    return guardados ? JSON.parse(guardados) : CONTACTOS_INICIALES;
+  });
+
   const [contactoEditando, setContactoEditando] = useState(null);
+
+  // 2. Persistencia automática: guarda en localStorage cada vez que cambie 'contactos'
+  useEffect(() => {
+    localStorage.setItem("contactos", JSON.stringify(contactos));
+  }, [contactos]);
 
   // Agregar contacto nuevo
   const agregarContacto = (nuevo) => {
